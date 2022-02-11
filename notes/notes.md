@@ -317,4 +317,170 @@ ng serve
 Initially we create the project not in strict mode, later the course will dive in optimizations.
 
 
-Angular is written in Typescript and compiles down to JS.
+#### App Loading
+
+The index.html file from the src folder is what's served from the server
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>FirstApp</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
+```
+
+The app-root which is in the app folder is our main app component automatically created by Angular.
+
+In the app.component.ts the app-root is selected using the selector property with the string 'app-root' and the component is configured and rendered. Component configuration is covered later.
+
+In the final index.html file Angular injects script tags for us automatically (We can't see it as it's done automatically afterwards, but can see them when inspecting in the browser). 
+
+The first code executed is in the main.ts file
+
+The bootstrapModule method is starting up our application and it is passed our app module that is imported
+
+main.ts
+```ts
+import { enableProdMode } from '@angular/core';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
+
+if (environment.production) {
+  enableProdMode();
+}
+
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.error(err));
+
+```
+
+In the app.module.ts file the @NgModule has a bootstrap array which lists all the components that should be known to angular when it analyzes our index.html file
+
+app.module.ts
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Because the app.component was listed in the bootstrap array it now analyzes it and read the component configuration with the app-root and then Angular then knows the app selector and how to handle it in the index.html file.
+
+app.component.ts
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  
+}
+```
+
+Angular knows that it should insert the app component which has a template attached to it as defined above. Then the app.component.html is rendered.
+
+index.html
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>FirstApp</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+  </head>
+  <body>
+    <app-root>I'm text that won't be seen because I'm overwritten by Angular at run time</app-root>
+  </body>
+</html>
+
+```
+
+app.component.html
+```html
+<h3>I'm in the AppComponent</h3>
+```
+
+#### Components
+
+To make our own components we make each component its own folder within the app folder. Here we will make a server folder to mock like we are going to show some info from a server.
+
+We create a server.component.ts file. Components are just TS classes so we export an empty ServerComponent.
+
+Then above our class we use the Component typescript decorator that we imported from the angular core module to configure our component. We give it a selector name that will correspond to what we use in the app.component.html and define the html template which is the path to the server.component.html file.
+
+server.component.ts
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+})
+
+export class ServerComponent {
+
+}
+```
+
+server.component.html
+```html
+<h1>Im the server component</h1>
+```
+
+Then in our app.module.ts we need to import and declare our new ServerComponent.
+
+app.module.ts
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { ServerComponent } from './server/server.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    ServerComponent
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+And finally add our defined selector for the server component to the app.component.html
+
+app.component.html
+```html
+<h3>I'm in the AppComponent</h3>
+<hr>
+<app-server></app-server>
+```
