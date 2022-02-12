@@ -1,0 +1,14 @@
+.container-md {
+  background-color: rgb(250, 72, 72);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.card {
+  text-align: center;
+  border-radius: 5px;
+  border: 1px solid black;
+  padding: 0 55px;
+}

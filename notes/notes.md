@@ -484,3 +484,99 @@ app.component.html
 <hr>
 <app-server></app-server>
 ```
+
+#### Create Components From CLI
+
+ng generate component component-name
+
+or 
+
+ng g c component-name
+
+We are going to make a servers component to hold our server (singular) component.
+
+ng g c servers
+
+This automatically creates the folder with all our necessary files (html and ts) pre configured, including a testing and css file.
+
+servers.component.ts
+```ts
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  templateUrl: './servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+Our app module.ts is also automatically updated to contain the new servers component.
+
+app.module.ts
+```ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { ServerComponent } from './server/server.component';
+import { ServersComponent } from './servers/servers.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    ServerComponent,
+    ServersComponent
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+Then we add it to our app.component.html
+
+app.component.html
+```html
+<h3>I'm in the AppComponent</h3>
+<hr>
+<app-servers></app-servers>
+```
+
+And then add our server component to our servers component. We use two just to show basic reusability of components.
+
+servers.component.html
+```html
+<app-server></app-server>
+<app-server></app-server>
+```
+
+When defining our template in the component, you can also do them inline instead of using an external file if desired. Change the template Url to template and then you can use back ticks and write in your components manually. After a few lines though it's best to use an external file for readability.
+
+
+```ts
+@Component({
+  selector: 'app-servers',
+  template: `
+  <app-server></app-server>
+  <app-server></app-server> 
+  `,
+  styleUrls: ['./servers.component.css']
+})
+```
+
+
+The styles can also be used with back ticks and the css will be applied in-line. Both the component styles and styleUrl property is an array as you can multiple stylesheets.
+
+
+
+The component selector is a string that is treated sort of like a css selector where you can select by class, element por attribute type, but nothing else. No id selector, pseudo selector etc.
