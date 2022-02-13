@@ -769,3 +769,122 @@ servers.component.ts
 ```ts
 serverName = 'Test Server';
 ```
+
+#### Directives
+
+Directives are instructions in the DOM. Further in the course there will be deeper learning but to start there are some built in ones to learn. 
+
+There are structural directives and attribute directives. Structural directives can add or remove elements and attribute directives only change the element they were placed on. 
+
+servers.component.ts
+```ts
+ serverCreated = false;
+
+ onCreateServer() {
+    this.serverCreated = true;
+    this.serverCreationStatus = 'Server was created Name is ' + this.serverName;
+  }
+```
+
+The ngIf directive can be used to conditionally render elements. It is used with the * syntax. It is more common to see just an if instead of the if else.
+
+The syntax with the if else defines a template which we put the content we want rendered in the case of the else and is referenced with the # syntax.
+
+servers.component.html
+```html
+<p *ngIf="serverCreated">Server was created. Server name is {{ serverName }}</p>
+
+<!-- OR to use an if else with ngIf -->
+
+<p *ngIf="serverCreated; else noServer">Server was created. Server name is {{ serverName }}</p>
+
+<ng-template #noServer>
+  <p>No server was created!</p>
+</ng-template>
+```
+
+Here we can us the ngStyle directive and property binding on the directive which we can then pass a js object and define different conditional styling based on a method we define on our class.
+
+server.component.html
+```html
+<p [ngStyle]="{backgroundColor: getColor()}">{{ 'server' }} with Id {{serverId}} is {{getServerStatus()}}</p>
+```
+
+
+server.component.ts
+```ts
+serverStatus = 'offline';
+
+constructor() {
+  this.serverStatus = Math.random() > 0.5 ? 'online' : 'offline';
+}
+
+getColor() {
+    return this.serverStatus === 'online' ? 'green' : 'red';
+  }
+```
+
+
+Here we can use the ngClass directive to set a css class again with property binding and pass it a js object that takes the class name and then the condition on whether or not to activate that class on the element.
+
+
+server.component.html
+```html
+<p [ngStyle]="{ backgroundColor: getColor() }"
+[ngClass]="{online: serverStatus === 'online'}">
+  {{ "server" }} with Id {{ serverId }} is {{ getServerStatus() }}
+</p>
+```
+
+server.component.ts
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+  styles: [`
+    .online {
+      color: white;
+    }
+  `]
+})
+
+export class ServerComponent {
+  serverId = 10;
+  serverStatus = 'offline';
+
+  constructor() {
+    this.serverStatus = Math.random() > 0.5 ? 'online' : 'offline';
+  }
+
+  getServerStatus() {
+    return this.serverStatus;
+  }
+
+  getColor() {
+    return this.serverStatus === 'online' ? 'green' : 'red';
+  }
+}
+```
+
+Here we add a servers array to our class and when creating a server push that server name to the array.
+
+servers.component.ts
+```ts
+  servers = ['Testserver', 'Testserver 2']
+
+  onCreateServer() {
+    this.serverCreated = true;
+    this.servers.push(this.serverName);
+    this.serverCreationStatus = 'Server was created Name is ' + this.serverName;
+  }
+
+```
+
+Then we us the * syntax because the ngFor is a structural directive not an attribute directive. And in it we use syntax similar to a for of loop to render a server for each server in the array. It's not adding the name or any dynamic content at this time.
+
+servers.component.html
+```html
+<app-server *ngFor="let server of servers"></app-server>
+```
