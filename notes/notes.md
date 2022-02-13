@@ -578,5 +578,194 @@ When defining our template in the component, you can also do them inline instead
 The styles can also be used with back ticks and the css will be applied in-line. Both the component styles and styleUrl property is an array as you can multiple stylesheets.
 
 
-
 The component selector is a string that is treated sort of like a css selector where you can select by class, element por attribute type, but nothing else. No id selector, pseudo selector etc.
+
+
+#### Data Binding
+
+Is essentially the communication between our business logic and the view. There are different ways to do this.
+
+Output data
+- String interpolation {{ data }}
+- Property binding [property] = "data"
+
+User Events
+- Event Binding (event)="expression"
+
+In Combination
+- Two-Way-Binding [(ngModel)]="data"
+
+
+#### String Interpolation
+
+This is similar to React where it has to be an expression that evaluates to a string. Flow control and multi line code blocks will not work.
+
+server.component.ts
+```ts
+import { Component } from "@angular/core";
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+})
+
+export class ServerComponent {
+  serverId = 10;
+  serverStatus = 'offline';
+
+  getServerStatus() {
+    return this.serverStatus;
+  }
+}
+```
+
+server.component.html
+```html
+<h1>{{ 'server' }} with Id {{serverId}} is {{getServerStatus()}}</h1>
+```
+
+#### Property Binding
+
+There are often times where you can use either property binding OR string interpolation. With experience you get a feel for what to use. 
+
+Here we use property binding on an html button element to bind to the disabled property using the [] syntax to tell angular that is the property we want to bind to. Then in the quotations we can pass an EXPRESSION that evaluates to what is required by that attribute. Ex.) The disabled attribute needs a boolean.
+
+servers.component.ts
+```ts
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  templateUrl: './servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+
+  allowNewServer = false;
+
+  constructor() { 
+    setTimeout(() => {
+      this.allowNewServer = true;
+    }, 2000)
+   }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+servers.component.html
+```html
+<button class="btn btn-primary" [disabled]="!allowNewServer">Add Server</button>
+<app-server></app-server>
+<app-server></app-server>
+```
+
+
+#### Event Binding
+
+We create a method on our class that updates a value. On the button we bind the event using () syntax with the specified DOM event then pass the expression we want to execute in the quotations.
+
+servers.component.ts
+```ts
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-servers',
+  templateUrl: './servers.component.html',
+  styleUrls: ['./servers.component.css']
+})
+export class ServersComponent implements OnInit {
+
+  allowNewServer = false;
+
+  serverCreationStatus = 'No server was created.'
+
+  constructor() { 
+    setTimeout(() => {
+      this.allowNewServer = true;
+    }, 2000)
+   }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer() {
+    this.serverCreationStatus = 'Server was created';
+  }
+
+}
+```
+
+servers.component.html
+```html
+<button class="btn btn-primary" [disabled]="!allowNewServer"
+(click)="onCreateServer()">Add Server</button>
+
+<p>{{ serverCreationStatus }}</p>
+
+<app-server></app-server>
+<app-server></app-server>
+```
+
+To pass data with event binding we use a reserved keyword in Angular $event.
+
+First we create a method on our class to call when the input event occurs. 
+
+Then we add an input that gets passed the method which takes in the $event. This way we can get all the event properties like e.target or e.target.value etc.
+
+servers.component.ts
+```ts
+export class ServersComponent implements OnInit {
+
+  allowNewServer = false;
+
+  serverCreationStatus = 'No server was created.';
+  serverName = '';
+
+  constructor() { 
+    setTimeout(() => {
+      this.allowNewServer = true;
+    }, 2000)
+   }
+
+  ngOnInit(): void {
+  }
+
+  onCreateServer() {
+    this.serverCreationStatus = 'Server was created';
+  }
+
+  onUpdateServerName(event: any) {
+    this.serverName = event.target.value;
+  }
+
+}
+```
+
+servers.component.html
+```html
+<label>Server Name</label>
+<input type="text" class="form-control" (input)="onUpdateServerName($event)">
+
+<p>{{ serverName }}</p>
+```
+
+#### Two-Way Data Binding
+
+Two way binding is used with the [()] syntax. Here the bottom input using 2 way binding has it's input value already set to Test Server whereas the on using event binding does not. Changing the event bound input will update BOTH the 2 way bound input and the paragraph tag. Updating the event bound input will not show in the event bound input.
+
+servers.component.html
+```html
+<input type="text" class="form-control" (input)="onUpdateServerName($event)">
+
+<input type="text" class="form-control" [(ngModel)]="serverName">
+
+<p>{{ serverName }}</p>
+```
+
+servers.component.ts
+```ts
+serverName = 'Test Server';
+```
