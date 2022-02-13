@@ -1,0 +1,7 @@
+<button class="btn btn-primary" (click)="onToggleDetails()">Toggle Details</button>
+
+<p *ngIf="showDetails">Super secret password is 'password 1234'</p>
+
+<p *ngFor="let logItem of log"
+[ngStyle]="{backgroundColor: logItem >= 5 ? 'blue' : 'transparent'}"
+[ngClass]="{whitey: logItem >= 5}">{{ logItem }}</p>
