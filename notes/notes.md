@@ -888,3 +888,184 @@ servers.component.html
 ```html
 <app-server *ngFor="let server of servers"></app-server>
 ```
+
+<!--! CONTINUE WITH COURSE NOTES BELOW -->
+
+
+
+
+
+
+
+
+<!--! CONTINUE WITH COURSE NOTES ABOVE UNTIL OBSERVABLE SECTION THEN CONTINUE BELOW -->
+
+# Jump ahead to Observables
+
+Observables:
+Are data sources. It is an object imported from RxJs.
+
+We have an observable and an observer and in between we have a stream or timeline. And on the timeline we can have multiple events emitted by the observable (little data packages).
+
+It can emit data because we tell it to, or when a user event happens or like the angular http request, when the data returns the event is emitted.
+
+The observer is YOUR code. This includes the subscribe funtion.
+We can write code for 3 instances: 
+- Handle the data 
+- Handle the Error
+- Handle the completion of the observable
+
+Observables DO NOT need to complete. Ex.) An observable hooked up to a button are always hooked up. An http observable WILL eventually complete.
+
+We use observables to handle async tasks beacuase we dont know when they will happen or how long they will take.
+
+Observable have a big advantage called operators (explained later).
+
+You can set up a subscriber to routing with route params for when the url parameters change.
+
+```ts
+import { ActivatedRoute, Params } from 'angular/router';
+
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit(){
+  this.route.params.subscribe(next: (params: Params) => {
+    this.id = +=params.id;
+  })
+}
+```
+
+Observables are constructs to which we subscribe to be informed about changes in data and our subscriptions will know about it.
+
+Observables are from the rxjs library.
+
+
+Observables don't necessarily stop emitting values when your not interested in them anymore. On this component we log an interval counting up every second. So when we leave the home page where the home page component is rendered the observable is still running. When we navigate back to the home page ANOTHER observable is created. Then we have 2 timers. This quickly causes a memory leak, uses up resources and slows our applications. So we should store our subscriptions and cancel them when we're done with them.
+
+```ts
+import { Component, OnInit } from '@angular/core';
+
+import { interval } from 'rxjs';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+    console.log('Working')
+    interval(1000).subscribe( count => {
+      console.log(count);
+    })
+  }
+
+}
+```
+
+We import Subscription from rxjs and store our subscription in a variable then using the lifecycle hook OnDestroy that we import, we cancel the subscription when we navigate away from the home page (kinda like component will or did unmount)
+
+```ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+
+import { interval, Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit, OnDestroy {
+
+  private firstObsSubscription: Subscription;
+
+  constructor() { }
+
+  ngOnInit() {
+    console.log('Working')
+    this.firstObsSubscription = interval(1000).subscribe( count => {
+      console.log(count);
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.firstObsSubscription.unsubscribe();
+  }
+}
+```
+
+With observables provided by Angular they are managed by angular and we do not need to unsubscribe manually.
+
+## A Custom Observable
+
+We import the Observable from rxjs and call the create method to create an observable. Which gets the observer, which is the listener for the observable and we can define what it needs to do when data is emitted. Here we replicate the built in interval from rxjs manually.
+
+We create a count, set an interval that will call the observers next method (There are a few method we can use on the observer for handling data, errors or completion) where we pass in the count, and then increment the count every second. 
+
+Then we make sure we store or subscription to unsubscribe.
+
+```ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+
+import { interval, Subscription, Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit, OnDestroy {
+
+  private firstObsSubscription: Subscription;
+
+  constructor() { }
+
+  ngOnInit() {
+    console.log('Working')
+    // this.firstObsSubscription = interval(1000).subscribe( count => {
+    //   console.log(count);
+    // })
+
+    const customObservable = Observable.create(observer => {
+      let count = 0;
+      setInterval(() => {
+        observer.next(count);
+        count++;
+      }, 1000)
+    });
+
+    this.firstObsSubscription = customObservable.subscribe((data) => {
+      console.log(data);
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.firstObsSubscription.unsubscribe();
+  }
+}
+```
+
+Operators:
+
+We hav an observable and an observer and in between we set up the subscription. There are built in operators that can sit in between this still in between BEFORE we set up our subscription and the observable. This can alter the data before the subscription gets the data. These operators come from rxjs.
+
+These can be used with the pipe() method which every observable gets.
+
+We need to make sure we put it IN FRONT of our subscription.
+
+
+```ts
+import { map } 'rxjs/operators'
+
+this.firstObsSubscription = customObservable.pipe(map(data => {
+  return 'Round: ' + (data + 1)
+})).subscribe((data) => {
+      console.log(data);
+    })
+```
+
+Subjects:
+
