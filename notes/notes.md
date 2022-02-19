@@ -901,6 +901,9 @@ We can use property and event binding on HTML elements with their native propert
 
 With our own components we can also bind to custom property and event binding.
 
+
+#### Passing Data Down - Property Binding
+
 To pass data down through components we need to explicitly allow those properties to be accessible to other components by using the @Input() decorator.
 
 
@@ -974,8 +977,134 @@ Then in our html our the child component since we are accepting the input we can
 </div>
 ```
 
+This is similar to passing props in React.
 
+We can alias the property by setting it to whatever we want in the @Input decorator.
 
+```ts
+  @Input('srvEl') element: {type: string, name: string, content: string};
+```
+
+```html
+<app-server-element 
+  *ngFor="let serverEl of serverElements"
+  [srvEl]="serverEl"></app-server-element>
+```
+
+#### Passing Data Up - Event Binding
+
+To inform parents from the child we using event binding.
+
+We have our components listen for a user event of a click on the buttons. Then in the event handler method we define a property using the output decorator that we want our parent to be able to access. We set that property to a new EventEmitter using the <> to define the data type we want to emit as well as using the () to call it as its constructor. Then inside the event handler on the child component we call that property and the emit() method on it with the actual data we want to pass up to the parent.
+
+cockpit component
+```html
+<div class="row">
+  <div class="col-xs-12">
+    <p>Add new Servers or blueprints!</p>
+    <label>Server Name</label>
+    <input type="text" class="form-control" [(ngModel)]="newServerName">
+    <label>Server Content</label>
+    <input type="text" class="form-control" [(ngModel)]="newServerContent">
+    <br>
+    <button
+      class="btn btn-primary"
+      (click)="onAddServer()">Add Server</button>
+    <button
+      class="btn btn-primary"
+      (click)="onAddBlueprint()">Add Server Blueprint</button>
+  </div>
+</div>
+```
+
+cockpit component
+```ts
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-cockpit',
+  templateUrl: './cockpit.component.html',
+  styleUrls: ['./cockpit.component.css']
+})
+export class CockpitComponent implements OnInit {
+   @Output() serverCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+   @Output() blueprintCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+
+  newServerName = '';
+  newServerContent = '';
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+  onAddServer() {
+    console.log(this.newServerName);
+    console.log(this.newServerContent);
+    this.serverCreated.emit({serverName: this.newServerName, serverContent: this.newServerContent});
+  }
+
+  onAddBlueprint() {
+    console.log(this.newServerName);
+    console.log(this.newServerContent);
+    this.blueprintCreated.emit({serverName: this.newServerName, serverContent: this.newServerContent})
+  }
+}
+```
+
+Then in our parent when we use our child component we use event binding to listen to those event emitters stored inside those created properties and call any method we want from our parent component.
+
+app component
+```html
+<div class="container">
+  <app-cockpit 
+  (serverCreated)="onServerAdded($event)"
+  (blueprintCreated)="onBlueprintAdded($event)"
+  
+  ></app-cockpit>
+  <hr>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <app-server-element *ngFor="
+      let serverEl of serverElements"
+      [srvEl]="serverEl"></app-server-element>
+    </div>
+  </div>
+</div>
+```
+
+Here we know our methods will be called with the $event data which is our data that we defined to be sent up in the event emitters. We push the object to the array and then our other server component renders it out accordingly.
+
+app component
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  serverElements = [{type: 'server', name: 'testy', content: 'Test server'}];
+
+  onServerAdded(serverData: {serverName: string, serverContent: string}) {
+    this.serverElements.push({
+      type: 'server',
+      name: serverData.serverName,
+      content: serverData.serverContent
+    });
+  }
+
+  onBlueprintAdded(blueprintData: {serverName: string, serverContent: string}) {
+    this.serverElements.push({
+      type: 'blueprint',
+      name: blueprintData.serverName,
+      content: blueprintData.serverContent
+    });
+  }
+}
+```
 
 
 
