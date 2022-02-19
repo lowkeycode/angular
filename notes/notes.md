@@ -889,9 +889,10 @@ servers.component.html
 <app-server *ngFor="let server of servers"></app-server>
 ```
 
-<!--! CONTINUE WITH COURSE NOTES BELOW -->
 
+## Debugging
 
+The CLI provides source maps which maps our compiled JS to our TS files. Here we can then use the dev tools to add breakpoints and debuggers by going to the sources tab, going to webpack and the . folder. Inside is our TS files where we can then do normal debugging instead of trying to sift through a compiled JS file trying to find where bugs are happening in our code.
 
 
 
@@ -900,7 +901,7 @@ servers.component.html
 
 <!--! CONTINUE WITH COURSE NOTES ABOVE UNTIL OBSERVABLE SECTION THEN CONTINUE BELOW -->
 
-# Jump ahead to Observables
+## Observables
 
 Observables:
 Are data sources. It is an object imported from RxJs.
@@ -999,7 +1000,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 With observables provided by Angular they are managed by angular and we do not need to unsubscribe manually.
 
-## A Custom Observable
+#### A Custom Observable
 
 We import the Observable from rxjs and call the create method to create an observable. Which gets the observer, which is the listener for the observable and we can define what it needs to do when data is emitted. Here we replicate the built in interval from rxjs manually.
 
@@ -1066,6 +1067,4 @@ this.firstObsSubscription = customObservable.pipe(map(data => {
       console.log(data);
     })
 ```
-
-Subjects:
 
