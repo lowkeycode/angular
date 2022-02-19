@@ -895,6 +895,97 @@ servers.component.html
 The CLI provides source maps which maps our compiled JS to our TS files. Here we can then use the dev tools to add breakpoints and debuggers by going to the sources tab, going to webpack and the . folder. Inside is our TS files where we can then do normal debugging instead of trying to sift through a compiled JS file trying to find where bugs are happening in our code.
 
 
+## Components & Data Binding
+
+We can use property and event binding on HTML elements with their native properties and events. We can also use directives (Structural and attribute) to bind to custom properties and events.
+
+With our own components we can also bind to custom property and event binding.
+
+To pass data down through components we need to explicitly allow those properties to be accessible to other components by using the @Input() decorator.
+
+
+Here we have the serverElements array in the parent component. And in the html we want to loop over it and pass each looped over element into the element property.
+
+app component
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  serverElements = [{type: 'server', name: 'testy', content: 'Test server'}];
+}
+```
+
+app component
+```html
+<div class="container">
+  <app-cockpit></app-cockpit>
+  <hr>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <app-server-element *ngFor="
+      let serverEl of serverElements"
+      [element]="serverEl"></app-server-element>
+    </div>
+  </div>
+</div>
+```
+
+Then when we define the component that we be rendered for each iteration of the loop we import the @Input() decorator and use it to expose the element property by allowing it to accept input from the parent component that is rendering it.
+
+server element
+```ts
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-server-element',
+  templateUrl: './server-element.component.html',
+  styleUrls: ['./server-element.component.css']
+})
+export class ServerElementComponent implements OnInit {
+
+  @Input() element: {type: string, name: string, content: string};
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+Then in our html our the child component since we are accepting the input we can access those properties that were passed down.
+
+```html
+<div
+  class="panel panel-default">
+  <div class="panel-heading">{{ element.name }}</div>
+  <div class="panel-body">
+    <p>
+      <strong *ngIf="element.type === 'server'" style="color: red">{{ element.content }}</strong>
+      <em *ngIf="element.type === 'blueprint'">{{ element.content }}</em>
+    </p>
+  </div>
+</div>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
