@@ -1270,7 +1270,66 @@ Called every time the view (and child's view) have been checked
 Called right before the object is destroyed by Angular (great for clean up work)
 
 
+The life cycle methods in the code are used on the server element component with buttons in the app component template that alter the server elements array that is passed down to the server elements component.
 
+Any life cycle hook needs to be imported from angular and it's interface should be added to the implements list.
+
+Note: The only life cycle hook that accepts an argument is the ngOnChanges, which will track changes to @Input properties that have changed inside that component. So here since only the name is changed that is all that is tracked as the type & content are actually rendered through the ng-content in the app component.
+
+server elements component
+```ts
+import { Component, OnInit, Input, OnChanges, SimpleChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy } from '@angular/core';
+
+@Component({
+  selector: 'app-server-element',
+  templateUrl: './server-element.component.html',
+  styleUrls: ['./server-element.component.css']
+})
+export class ServerElementComponent implements OnInit, OnChanges, DoCheck, AfterContentInit, AfterContentChecked, AfterViewInit, AfterViewChecked, OnDestroy {
+
+  @Input('srvEl') element: {type: string, name: string, content: string};
+
+  @Input() name: string;
+
+  constructor() {
+    console.log('constructor')
+   }
+
+  ngOnChanges(changes: SimpleChanges) {
+  console.log('ngonchanges');
+  console.log(changes);
+  }
+
+  ngOnInit(): void {
+    console.log('ngoninit');
+  }
+
+  ngDoCheck() {
+    console.log('ngdocheck ++')
+  }
+
+  ngAfterContentInit() {
+    console.log('ngaftercontentinit');
+  }
+
+  ngAfterContentChecked() {
+    console.log('ngaftercontentchecked');
+  }
+
+  ngAfterViewInit() {
+    console.log('ngafterviewinit');
+  }
+
+  ngAfterViewChecked() {
+    console.log('ngafterviewchecked');
+  }
+
+  ngOnDestroy() {
+    console.log('Destroy!!!')
+  }
+
+}
+```
 
 
 

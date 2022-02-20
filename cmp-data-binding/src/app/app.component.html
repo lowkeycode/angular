@@ -8,9 +8,12 @@
 
   <div class="row">
     <div class="col-xs-12">
+      <button class="btn btn-primary" (click)="onChangeFirst()">Change First Element</button>
+      <button class="btn btn-danger" (click)="onDestroyFirst()">Destroy First Element</button>
       <app-server-element *ngFor="
       let serverEl of serverElements"
-      [srvEl]="serverEl">
+      [srvEl]="serverEl"
+      [name]="serverEl.name">
         <p>
           <strong *ngIf="serverEl.type === 'server'" style="color: red">{{ serverEl.content }}</strong>
           <em *ngIf="serverEl.type === 'blueprint'">{{ serverEl.content }}</em>
