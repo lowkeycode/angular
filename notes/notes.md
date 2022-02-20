@@ -1246,8 +1246,28 @@ server element component
 </div>
 ```
 
+#### Component Lifecycle
 
 
+ngOnInit is a lifecycle hook and angular supports a few. Components have different phases (similar to react).
+
+- ngOnChanges 
+Executed when a component is created AND every time a bound input property changes (properties decorated with @Input)
+- ngOnInit
+Called once the component has been initialized i.e. the object has been created  (not necessarily rendered to the DOM and runs AFTER the constructor)
+ngDo
+- ngDoCheck
+Called every time change detection runs (Not if something changed but on EVERY check)
+- ngAfterContentInit
+Called after content (ng-content) has been projected into the view (The view of the parent component)
+- ng After ContentChecked
+Called every time projected content is checked
+- ngAfterViewInit 
+Called after the components view (and child's view) has been initialized
+- ngAfterViewChecked 
+Called every time the view (and child's view) have been checked
+- ngOnDestroy
+Called right before the object is destroyed by Angular (great for clean up work)
 
 
 
