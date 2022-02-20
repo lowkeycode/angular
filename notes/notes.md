@@ -1106,6 +1106,69 @@ export class AppComponent {
 }
 ```
 
+Type Aliasing with the @Output decorator is the exact same as property binding. The event then has the aliased name.
+
+#### View Encapsulation
+
+Angular enforces component style encapsulation with css by default as opposed to the natural behavior of css.
+
+You can over ride this by adding and encapsulation property to the @Component decorator and choose between 3 different modes. By default it is ViewEncapsulation.Emulated. Then there ViewEncapsulation.None which makes any defined styles back to global. ViewEncapsulation.Native uses the shadow dom (the shadow dom is not supported by all browsers).
+
+
+#### Local References With Templates
+
+Sometimes we don't need to utilize two-way data binding and just need to grab the value at the time of the event.
+
+cockpit component
+```html
+<!--  Two way data-binding -->
+<label>Server Name</label>
+<input type="text" class="form-control" [(ngModel)]="newServerName">
+
+<button
+class="btn btn-primary"
+(click)="onAddServer()">Add Server</button>
+
+<!-- Local Reference -->
+<input type="text"
+class="form-control" 
+#serverNameInput>
+
+<button
+class="btn btn-primary"
+(click)="onAddServer(serverNameInput)">Add Server</button>
+```
+Local references use the # syntax and reference the actual html element. They can only be used inside html templates not in typescript code.
+
+We pass the local reference through to our method bound to the click event and then in our TS file we make sure to define the argument type that coming in which is an HTMLInputElement and then we can grab the value off it to use inside our method.  Then we no longer need the newServerName variable that used two-way binding.
+
+cockpit component
+```ts
+export class CockpitComponent implements OnInit {
+   @Output() serverCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+   @Output() blueprintCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+
+  // newServerName = '';
+  newServerContent = '';
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+  onAddServer(nameInput: HTMLInputElement) {
+    console.log(nameInput.value)
+    
+    this.serverCreated.emit({serverName: nameInput.value, serverContent: this.newServerContent});
+  }
+
+  onAddBlueprint(nameInput: HTMLInputElement) {
+    this.blueprintCreated.emit({serverName: nameInput.value, serverContent: this.newServerContent})
+  }
+}
+```
+
+
 
 
 
