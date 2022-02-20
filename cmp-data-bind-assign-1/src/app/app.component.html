@@ -1,0 +1,12 @@
+<app-game-control (count)="onCountStarted($event)"></app-game-control>
+
+<div class="odd-even-container" *ngIf="currentCount % 2 === 0 then even; else odd;">
+</div>
+
+<ng-template #odd>
+  <app-odd [count]="currentCount"></app-odd>
+</ng-template>
+
+<ng-template #even>
+  <app-even [count]="currentCount"></app-even>
+</ng-template>

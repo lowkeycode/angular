@@ -14,7 +14,7 @@
       let serverEl of serverElements"
       [srvEl]="serverEl"
       [name]="serverEl.name">
-        <p>
+        <p #contentParagraph>
           <strong *ngIf="serverEl.type === 'server'" style="color: red">{{ serverEl.content }}</strong>
           <em *ngIf="serverEl.type === 'blueprint'">{{ serverEl.content }}</em>
         </p>
