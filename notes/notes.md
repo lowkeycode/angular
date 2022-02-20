@@ -1168,11 +1168,83 @@ export class CockpitComponent implements OnInit {
 }
 ```
 
+#### Accessing The Template & DOM With @ViewChild
+
+This lets you access the first element with the matching selector in the view DOM. If the view DOM changes and a new child matches the selector, the property is updated.
 
 
+Note: If you plan on accessing the selected element inside of ngOnInit() you need to use...
+```ts
+@ViewChild('serverContentInput', {static: true}) serverContentInput: ElementRef;
+```
+On Angular versions < 9 you need to add static: false
+
+```ts
+@ViewChild('serverContentInput', {static: false}) serverContentInput: ElementRef;
+```
+
+In our html template we create a local reference using the # syntax.
+
+cockpit component
+```ts
+import { Component, EventEmitter, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
+
+ @ViewChild('serverContentInput', {static: true}) serverContentInput: ElementRef;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+  onAddServer() {
+    console.log(this.serverContentInput);
 
 
+    // this.serverCreated.emit({serverName: nameInput.value, serverContent: this.newServerContent});
+  }
+  ```
 
+#### Projecting Content With ng-content
+
+By default any content put between a customer components opening and closing tags is stripped out. If we do want to put content in there we can use the ng-content tag in our defined template and then the content we put between the opening and closing tags when using our component will then be display.
+
+app component
+```html 
+<div class="container">
+  <app-cockpit 
+  (serverCreated)="onServerAdded($event)"
+  (blueprintCreated)="onBlueprintAdded($event)"
+  
+  ></app-cockpit>
+  <hr>
+
+  <div class="row">
+    <div class="col-xs-12">
+      <app-server-element *ngFor="
+      let serverEl of serverElements"
+      [srvEl]="serverEl">
+        <p>
+          <strong *ngIf="serverEl.type === 'server'" style="color: red">{{ serverEl.content }}</strong>
+          <em *ngIf="serverEl.type === 'blueprint'">{{ serverEl.content }}</em>
+        </p>
+      </app-server-element>
+    </div>
+  </div>
+</div>
+```
+
+server element component
+```html
+<div
+  class="panel panel-default">
+  <div class="panel-heading">{{ element.name }}</div>
+  <div class="panel-body">
+    <ng-content>
+      
+    </ng-content>
+  </div>
+</div>
+```
 
 
 
