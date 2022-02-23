@@ -1206,7 +1206,7 @@ import { Component, EventEmitter, OnInit, Output, ViewChild, ElementRef } from '
 
 #### Projecting Content With ng-content
 
-By default any content put between a customer components opening and closing tags is stripped out. If we do want to put content in there we can use the ng-content tag in our defined template and then the content we put between the opening and closing tags when using our component will then be display.
+By default any content put between a custom components opening and closing tags is stripped out. If we do want to put content in there we can use the ng-content tag in our defined template and then the content we put between the opening and closing tags when using our component will then be display.
 
 app component
 ```html 
