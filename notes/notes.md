@@ -1502,3 +1502,57 @@ this.firstObsSubscription = customObservable.pipe(map(data => {
     })
 ```
 
+## Understanding Directives
+
+#### Creating Custom Directives
+
+we create a basic-highlight folder and create a basic-highlight.directive.ts file and inside put our directive class.
+
+We import our @Directive decorator so we can configure our directive. We set a selector and use [] syntax to show that we want to target that attribute on any given element, so when we add it in our html template we just put it on an element like a regular attribute without the [].
+
+Then we want to pass in the element reference to the constructor and give it an ElementRef type also giving it a private modifier so it is automatically set as a property on our class on instantiation.
+
+And in our ngOnInit hook we select the style of the native element to change it.
+
+basic-highlight.directive.ts
+```ts
+import { Directive, ElementRef, OnInit } from "@angular/core";
+
+@Directive({
+  selector: '[appBasicHighlight]'
+})
+
+export class BasicHighlightDirective implements OnInit {
+  constructor(private elementRef: ElementRef) {
+  }
+
+  ngOnInit() {
+    this.elementRef.nativeElement.style.backgroundColor = 'green';
+  }
+}
+```
+
+Then we set the directive on our element.
+
+```html
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <button
+        class="btn btn-primary"
+        (click)="onlyOdd = !onlyOdd">Only show odd numbers</button>
+      <br><br>
+      <ul class="list-group">
+        <li
+          class="list-group-item">
+        </li>
+      </ul>
+
+
+      <p appBasicHighlight>Custom directive</p>
+
+
+    </div>
+  </div>
+</div>
+```
