@@ -1587,3 +1587,36 @@ export class BetterHighlightDirective {
 ```html
 <p appBetterHighlight>Better directive</p>
 ```
+
+#### HostListener
+
+We can use the @HostListener decorator which takes a DOM even and then we provide a custom named function to execute on that event (The custom method also gets the event data, which we can use for custom events).
+
+So here we update the style of our p tag in the template via the directive and host listener on the mouse events
+
+better-directive
+```ts
+import { Directive, Renderer2, OnInit, ElementRef, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective {
+  
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) { }
+
+  ngOnInit() {
+    // this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'blue')
+  }
+
+  @HostListener('mouseenter') mouseover(eventData: Event) {
+    console.log(eventData);
+    this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'blue')
+  }
+
+  @HostListener('mouseleave') mouseleave(eventData: Event) {
+    console.log(eventData);
+    this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'transparent')
+  }
+}
+```
