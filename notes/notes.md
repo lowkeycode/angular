@@ -1556,3 +1556,34 @@ Then we set the directive on our element.
   </div>
 </div>
 ```
+
+Accessing element directly like this is not a good practice.
+
+#### Renderer
+
+Directives can also be created through the CLI.
+
+ng g d directive-name --skip-tests
+
+Angular is not limited to running in the browser. It also works with service works. These are environments where we may not have access to the DOM. So accessing the DOM directly accessing the nativeElement and the style of that element, you can get errors. So it is better practice to use the renderer for DOM access with it's provided methods.
+
+better-directive
+```ts
+import { Directive, Renderer2, OnInit, ElementRef } from '@angular/core';
+
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective {
+
+  constructor(private elementRef: ElementRef, private renderer: Renderer2) { }
+
+  ngOnInit() {
+    this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'blue')
+  }
+}
+```
+
+```html
+<p appBetterHighlight>Better directive</p>
+```
