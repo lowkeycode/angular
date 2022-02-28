@@ -1750,7 +1750,7 @@ With services we do not instantiate them manually. Angular provides dependency i
 
 Angular create and instantiates our components with our selector names we write in out html templates ex.) app-new-account. And the way we create reusable services in Angular we stay within the tools angular provides instead of manually instantiating our services. We export our service as a regular class and import it to our component where we want to use it. Then we pass it to the constructor so when the app component is created angular automatically creates an instance of our service on the component as a property using the private modifier.
 
-Now angular knows we want an instance of that service. Now we need to tell angular how to give us such an instance or how to create it, which is simple. We add it as a provider to this component by adding a providers array in the @Component decorator. Now we can do the same in any component where we want to use our service.
+Now angular knows we want an instance of that service. Now we need to tell angular how to give us such an instance or how to create it, which is simple. We add it as a provider to this component by adding a providers array in the @Component decorator. Now we can inject our service in any component where we want to use our service.
 
 logging service
 ```ts
@@ -1791,3 +1791,9 @@ export class NewAccountComponent {
 }
 
 ```
+
+Services have heirarchical injection so any component that has the service injected share the same instance of the service as all of its children.
+
+Any instances of services inherited from parent components ARE OVERWRITTEN if the service is additionally injected into the child component.
+
+If you need the same instance on children as well as parent and don't want to overwrite the parents instance REMOVE THE SERVICE FROM THE CHILD COMPONENT PROVIDERS ARRAY.
