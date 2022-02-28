@@ -1797,3 +1797,35 @@ Services have heirarchical injection so any component that has the service injec
 Any instances of services inherited from parent components ARE OVERWRITTEN if the service is additionally injected into the child component.
 
 If you need the same instance on children as well as parent and don't want to overwrite the parents instance REMOVE THE SERVICE FROM THE CHILD COMPONENT PROVIDERS ARRAY.
+
+#### Injecting Services Into Services
+
+The highest possible level for services is in the app.module. This way we can ensure all components receive the same instance of the service unless a child component overwrites it.
+
+In Angular 6+ to provide application wide services  just type...
+```ts
+@Injectable({providedIn: 'root'})
+export class MyService { ... }
+```
+As opposed to 
+```ts
+export class MyService { ... }
+```
+
+```ts
+import { MyService } from './path/to/my.service';
+ 
+@NgModule({
+    ...
+    providers: [MyService]
+})
+export class AppModule { ... }
+```
+
+To use a service inside another service we inject it in the constructor. If we inject a service into something ex.) another service, we need to give that something some metadata with the @Injectable decorator. This tells angular that something can be injected into that service. It goes on the thing getting injected into or the receiving thing.
+
+In newer versions of angular it's recommended to just add the @Injectable decorator regardless.
+
+#### Services For Cross Component Communication
+
+You can create an event emitter on the service and then use it to emit in one component, passing it data from that component and then in another component subscribe to that custom event to get the data from the other component.
