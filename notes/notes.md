@@ -1706,3 +1706,39 @@ export class BetterHighlightDirective {
 <p appBasicHighlight>Custom directive</p>
 <p appBetterHighlight [defaultColor]="'blue'" [highlightColor]="'yellow'">Better directive</p>
 ```
+
+
+#### Custom Structural Directive
+
+```ts
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+@Directive({
+  selector: '[appUnless]'
+})
+export class UnlessDirective {
+  @Input() set appUnless(condition: boolean) {
+    if(!condition) {
+      this.viewContainerRef.createEmbeddedView(this.templateRef);
+    } else {
+      this.viewContainerRef.clear();
+    }
+  }
+
+  constructor(private templateRef: TemplateRef<any>, private viewContainerRef: ViewContainerRef) { }
+
+}
+```
+
+```html
+<ul class="list-group">
+  <li
+    class="list-group-item">
+  </li>
+  <li *appUnless="onlyOdd">Unless custom structural directive</li>
+</ul>
+```
+
+#### ngSwitch
+
+Very similar to a switch statement in vanilla JS. Just look it up, it's easy to figure out.
