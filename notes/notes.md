@@ -1483,9 +1483,42 @@ export class HomeComponent implements OnInit, OnDestroy {
 }
 ```
 
+When an observable throws an error it is finished and you do not need to unsubscribe.
+
+```ts
+const customIntObs = new Observable(subscriber => {
+      let count = 0;
+      setInterval(() => {
+        subscriber.next(count);
+
+        if(count > 3) {
+          subscriber.error(new Error('Count is higher than 3'))
+        }
+
+        count++;
+      }, 1000);
+    });
+
+
+    this.firstObsSubscription = customIntObs.subscribe(data => {
+      console.log(data);
+    }, error => console.log(error),
+    () => {
+      console.log('Completed')
+    })
+```
+
+To handle the thrown error we write the error handling function int the subscribe method.
+
+
+When an observable completes no other values are emitted. If we want to do something when it completes we write our complete function in the subscribe method. No need to unsubscribe from a completed observable. The complete function takes not arguments and is useful for clean up work. Complete does not fire when an error is thrown.
+
+
+#### Operators
+
 Operators:
 
-We hav an observable and an observer and in between we set up the subscription. There are built in operators that can sit in between this still in between BEFORE we set up our subscription and the observable. This can alter the data before the subscription gets the data. These operators come from rxjs.
+We have an observable and an observer(also called subscriber) and in between we set up the subscription. There are built in operators that can sit in between this still in between BEFORE we set up our subscription and the observable. This can alter the data before the subscription gets the data. These operators come from rxjs.
 
 These can be used with the pipe() method which every observable gets.
 
@@ -1501,6 +1534,27 @@ this.firstObsSubscription = customObservable.pipe(map(data => {
       console.log(data);
     })
 ```
+
+Pipe can be passed as many operators as need to transform our data prior to our subscribe method getting it.
+
+```ts
+this.firstObsSubscription = customIntObs.pipe(filter(data => {
+      return data > 0;
+    }),map((data: number) => {
+      return 'Round: ' + (data + 1)
+    })).subscribe(data => {
+      console.log(data);
+    }, error => console.log(error))
+```
+
+#### Subjects
+
+Subjects are a special kinda of Observable that are more active. Whereas regular observables a re more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer/subscriber handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
+
+Remember to store and unsubscribe from Subjects subscription to prevent memory leaks.
+
+
+
 
 ## Understanding Directives
 
