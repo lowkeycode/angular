@@ -1549,10 +1549,18 @@ this.firstObsSubscription = customIntObs.pipe(filter(data => {
 
 #### Subjects
 
-Subjects are a special kinda of Observable that are more active. Whereas regular observables a re more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer/subscriber handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
+Subjects are a special kinda of Observable that are more active. Whereas regular observables are more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer/subscriber handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
 
 Remember to store and unsubscribe from Subjects subscription to prevent memory leaks.
 
+
+## RxJS
+
+Think of RxJS as Lodash but for events.
+
+The operators are what make RxJS so powerful. RxJS is pretty much a funnel that we can use a huge amount of built in operators to perform actions on asynchronous code like events and the data they are emitting AND chain as many operators as we need.
+
+#### Observables, Observers(Subscribers) & Subscriptions
 
 
 
