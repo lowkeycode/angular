@@ -1352,7 +1352,7 @@ We can write code for 3 instances:
 
 Observables DO NOT need to complete. Ex.) An observable hooked up to a button are always hooked up. An http observable WILL eventually complete.
 
-We use observables to handle async tasks beacuase we dont know when they will happen or how long they will take.
+We use observables to handle async tasks because we dont know when they will happen or how long they will take.
 
 Observable have a big advantage called operators (explained later).
 
@@ -1518,7 +1518,7 @@ When an observable completes no other values are emitted. If we want to do somet
 
 Operators:
 
-We have an observable and an observer(also called subscriber) and in between we set up the subscription. There are built in operators that can sit in between this still in between BEFORE we set up our subscription and the observable. This can alter the data before the subscription gets the data. These operators come from rxjs.
+We have an observable and an observer and in between we set up the subscription. There are built in operators that can sit in between this still in between BEFORE we set up our subscription and the observable. This can alter the data before the subscription gets the data. These operators come from rxjs.
 
 These can be used with the pipe() method which every observable gets.
 
@@ -1549,7 +1549,7 @@ this.firstObsSubscription = customIntObs.pipe(filter(data => {
 
 #### Subjects
 
-Subjects are a special kinda of Observable that are more active. Whereas regular observables are more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer/subscriber handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
+Subjects are a special kinda of Observable that are more active. Whereas regular observables are more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
 
 Remember to store and unsubscribe from Subjects subscription to prevent memory leaks.
 
@@ -1560,9 +1560,159 @@ Think of RxJS as Lodash but for events.
 
 The operators are what make RxJS so powerful. RxJS is pretty much a funnel that we can use a huge amount of built in operators to perform actions on asynchronous code like events and the data they are emitting AND chain as many operators as we need.
 
-#### Observables, Observers(Subscribers) & Subscriptions
+#### Observables, Observers & Subscriptions
+
+- Observables are streams of data.
+- Observers execute code when data is emitted, when there is an error or when the Observable emits that it is done (next, error, complete methods)
+- The connection between the two is set up using a Subscription. (subscribe method)
+
+There are many RxJS methods that automatically create these observables for use to subscribe to.
+
+The essential concepts in RxJS which solve async event management are:
+
+Observable: 
+- represents the idea of an invokable collection of future values or events.
+
+Observer: 
+- is a collection of callbacks that knows how to listen to values delivered by the Observable.
+
+Subscription: 
+- represents the execution of an Observable, is primarily useful for cancelling the execution.
+
+Operators: 
+- are pure functions that enable a functional programming style of dealing with collections with operations like map, filter, concat, reduce, etc.
+
+Subject: 
+- is equivalent to an EventEmitter, and the only way of multicasting a value or event to multiple Observers.
+
+Schedulers: 
+- are centralized dispatchers to control concurrency, allowing us to coordinate when computation happens on e.g. setTimeout or requestAnimationFrame or others.
+
+Make sure to unsubscribe and clean up to prevent memory leaks. Do this by storing the subscription (which is the result of calling subscribe() on the observable) to the observable in a variable. Then calling unsubscribe() when you want to unsubscribe.
+
+Observables are lazy Push collections of multiple values. They are not the same as Event Emitters. They can behave like them when being multicasted with RxJS Subjects, but it is not common for them to act like this. Two Observable subscribes will cause the Observable to run twice. This differs from Event Emitters which share side effects and have eager execution regardless of the existence of subscribers. Observables have no shared execution and are lazy.
+
+Subscribing to an Observable is analogous to calling a Function.
+
+Observables differ from event handler APIs like addEventListener and removeEventListener. With observable.subscribe, the given Observer is not registered as a listener in the Observable. The Observable does not even maintain a list of attached Observers.
 
 
+You can create a custom unsubscribe function when working with custom observables. Used for doing specific clean up AND unsubscribing.
+
+```js
+const observable = new Observable(function subscribe(subscriber) {
+  // Keep track of the interval resource
+  const intervalId = setInterval(() => {
+    subscriber.next('hi');
+  }, 1000);
+
+  // Provide a way of canceling and disposing the interval resource
+  return function unsubscribe() {
+    clearInterval(intervalId);
+  };
+});
+```
+
+#### Observables to Promises
+
+The similarity between Observables and Promises is that both collections may produce values over time, but the difference is that Observables may produce none or more than one value, while Promises produce only one value when resolved successfully.
+
+To convert a promise into observable we can use the from() method to wrap the returning promise which we then call the .pipe() method on with the map operator.
+
+Below shows how to manually convert a promise into an observable. If we are doing anf http request though RxJS has a built in fromFetch function that does it automatically
+[fromFetch](https://rxjs.dev/api/fetch/fromFetch)
+
+```js
+const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+function getTodo() {
+  return from(fetch(url))
+    .pipe(map(response => response.json()));
+}
+
+getTodo().subscribe(console.log);
+```
+
+Keep in mind some promises may still be hanging around and will need to be dealt with. For example in the case of an http promise above, if the subscription is removed...
+
+```js
+const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+function getTodo() {
+  return from(fetch(url))
+    .pipe(map(response => response.json()));
+}
+
+getTodo();
+```
+
+... the http call still happens.
+
+We can solve this by either using an existing rxjs operator like defer, in combination with the from operator we're already using or you can decide to build the observable from scratch.
+
+```js
+function getTodo() {
+  return defer(() => from(fetch(url)));
+}
+
+const getTodo$ = getTodo();
+
+// 
+setTimeout(() => {
+  getTodo$.subscribe();
+}, 5000);
+```
+
+Or building ourselves
+
+```js
+function getTodo() {
+  return new Observable(observer => {
+    return from(fetch(url)).subscribe(observer);
+  });
+}
+
+const getTodo$ = getTodo();
+
+setTimeout(() => {
+  getTodo$.subscribe();
+}, 5000);
+
+```
+
+The above code will create an observable based on the promise and only subscribe to it after 5000 ms. The HTTP call is only triggered after 5 seconds. So our observable is now lazy in such a way that it will only resolve the promise (and trigger the HTTP call) when a subscription is added.
+
+Note that we are adding an explicit subscription which we're returning from the Observable's constructor callback as the teardown logic. Doing so ensures that that subscription is cleanup whenever we unsubscribe from the observable returned by getTodo().
+
+We're still missing one crucial part in our Promise to Observable conversion. In our case, the promise was representing an HTTP call. Whenever we unsubscribe from the observable before the HTTP call is finished, we probably want to abort the open HTTP request.
+
+
+
+```js
+function getTodo() {
+  return new Observable(observer => {
+    const abortController = new AbortController();
+    const subscription = from(fetch(url, {
+      signal: abortController.signal
+    })).subscribe(observer);
+
+    return () => {
+      abortController.abort();
+      subscription.unsubscribe();
+    }
+  });
+}
+
+const getTodo$ = getTodo();
+
+setTimeout(() => {
+  const sub = getTodo$.subscribe();
+  sub.unsubscribe();
+}, 5000);
+```
+
+
+<!-- ! DIRECTIVES BELOW  -->
 
 ## Understanding Directives
 
