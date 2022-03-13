@@ -1549,9 +1549,37 @@ this.firstObsSubscription = customIntObs.pipe(filter(data => {
 
 #### Subjects
 
-Subjects are a special kinda of Observable that are more active. Whereas regular observables are more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. We saw the next() method when building our custom observable that we could then consume in the observer handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
+Subjects are a special kind of Observable that are more active. Whereas regular observables are more passive subjects are active. This means we can call the next() method on them and force them to emit data from outside. 
+
+The concept is similar to an Event Emitter but it is like and Observable Event Emitter because we can force this special observable to emit when we want it to.
+
+We saw the next() method when building our custom observable that we could then consume in the observer handler function. These should replace event emitters ONLY WHEN COMMUNICATING CROSS COMPONENT USING SERVICES (not regular event emitters using the @Output decorator), are more efficient and can also use pipe on them as they are technically a type of observable.
 
 Remember to store and unsubscribe from Subjects subscription to prevent memory leaks.
+
+We create Subjects the same way as we create custom Observables.
+
+```js
+const subject = new Subject();
+
+subject.subscribe({
+  next(value) {
+    // Custom code
+    console.log(value);
+  },
+  complete(value) {
+    // Custom code
+  },
+  error(error) {
+    // Custom code
+  }
+})
+
+subject.next('Forced emit')
+// Forced emit
+```
+
+We can call this next method when ever we want. Ex.) A user clicks, or after a certain time etc. We control when something happens.
 
 
 ## RxJS
@@ -1710,6 +1738,8 @@ setTimeout(() => {
   sub.unsubscribe();
 }, 5000);
 ```
+
+
 
 
 <!-- ! DIRECTIVES BELOW  -->
