@@ -1331,10 +1331,6 @@ export class ServerElementComponent implements OnInit, OnChanges, DoCheck, After
 }
 ```
 
-
-
-<!--! CONTINUE WITH COURSE NOTES ABOVE UNTIL OBSERVABLE SECTION THEN CONTINUE BELOW -->
-
 ## Observables
 
 Observables:
@@ -1739,11 +1735,6 @@ setTimeout(() => {
 }, 5000);
 ```
 
-
-
-
-<!-- ! DIRECTIVES BELOW  -->
-
 ## Understanding Directives
 
 #### Creating Custom Directives
@@ -2071,3 +2062,11 @@ In newer versions of angular it's recommended to just add the @Injectable decora
 #### Services For Cross Component Communication
 
 You can create an event emitter on the service and then use it to emit in one component, passing it data from that component and then in another component subscribe to that custom event to get the data from the other component.
+
+
+## Pipes
+
+#### Basic Usage
+
+
+
