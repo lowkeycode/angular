@@ -2068,5 +2068,75 @@ You can create an event emitter on the service and then use it to emit in one co
 
 #### Basic Usage
 
+We can use built in pipes for data transformations on the output, leaving the original data unmutated.
+
+Pipes can be configured. Check their option in the documentation. Configuration is done by using the : syntax and passing the config values as strings.
+
+Pipes can be chained by adding multiple pipes. Sometimes order matters, so be careful.
+
+```html
+<li
+  class="list-group-item"
+  *ngFor="let server of servers"
+  [ngClass]="getStatusClasses(server)">
+  <span
+    class="badge">
+    {{ server.status }}
+  </span>
+  <strong>{{ server.name }}</strong> |
+  {{ server.instanceType | uppercase }} |
+  {{ server.started | date:'fullDate' }}
+</li>
+```
 
 
+#### Custom Pipes
+
+We create a pipe by importing the pipe decorator to give it its name that we want to use in our template. The pipe transform interface ensures we implement a transform method on a value and return an output.
+
+Make sure we add the pipe to the app module decorations array.
+
+Then define the custom logic we want to happen. This pipe rips out the first letter of every word except the last, upper cases it and puts it together as an acronym and appends the last word in uppercase.
+
+
+```ts
+import { Pipe, PipeTransform } from "@angular/core";
+
+@Pipe({
+  name: 'shorten'
+})
+export class ShortenPipe implements PipeTransform {
+  transform(value: any){
+    const wordsArray = value.split(" ");
+    const lastWord = wordsArray.pop();
+    const acronyms = wordsArray.map(word => word.slice(0, 1)).join("");
+    return `${acronyms.toUpperCase()} ${lastWord.toUpperCase()}`;
+  }
+}
+```
+
+Then use with the given name we defined in the pipe decorator.
+
+```html
+<li
+  class="list-group-item"
+  *ngFor="let server of servers"
+  [ngClass]="getStatusClasses(server)">
+  <span
+    class="badge">
+    {{ server.status }}
+  </span>
+  <strong>{{ server.name | shorten }}</strong> |
+  {{ server.instanceType | uppercase }} |
+  {{ server.started | date:'fullDate' }}
+</li>
+```
+
+If we want or need more parameters we just add them to the parameter list and build our code as required. Then we pass arguments with our colon syntax in our template.
+
+Ex.) shorten:5:12
+
+
+#### async Pipe
+
+The async pipe can be used with promises to show the resolved value when the async task returns. AND it can be used with observables to which it automatically subscribes
