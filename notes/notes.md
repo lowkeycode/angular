@@ -2140,3 +2140,96 @@ Ex.) shorten:5:12
 #### async Pipe
 
 The async pipe can be used with promises to show the resolved value when the async task returns. AND it can be used with observables to which it automatically subscribes
+
+## Routing
+
+We add routing by adding the routes type and router module to the app.module. (Or you can create a routing module and import it into here for more modularity - see previous course sections). Then define the routes and desired component to render. and use the forRoot method to render the routes. Then add the router-outlet component i nthe app to render components based on url path.
+
+```ts
+import { Routes, RouterModule } from '@angular/router';
+
+// ...
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent},
+  { path: 'users', component: UsersComponent},
+  { path: 'users/:id', component: UserComponent},
+  { path: 'servers', component: ServersComponent}
+]
+
+// ...
+
+imports: [
+    BrowserModule,
+    FormsModule,
+    RouterModule.forRoot(appRoutes)
+  ],
+
+```
+
+We add routerLinks to change the url path without reloading the page. Keeping in mind using / will be an absolute path starting from the root, ommitting it will be a relative path to whatever page url your on. ./ will be on that level and ../ will go up a level just like regular file systems.
+
+We can add the routerLinkActive to apply a class to any active route from being clicked (you can put it on a wrapping element like the li, which in this case is mandatory cause bootstrap overrides styling on the a tag)
+
+We can provide routerLinkOptions with aJS object to set exact to true so the home link will only show when it is active not all the time
+
+The routerLink can also be set as property binding and then we pass it an array that is more configurable for more complex routing and paths as we will learn soon.
+
+
+```html
+<li role="presentation"
+  routerLinkActive="active"
+  [routerLinkActiveOptions]="{exact: true}"
+  >
+  <a routerLink="/">Home</a>
+</li>
+<li role="presentation" routerLinkActive="active">
+  <a routerLink="/servers">Servers</a>
+</li>
+<li role="presentation" routerLinkActive="active">
+  <a [routerLink]="['users']">Users</a>
+</li>
+```
+
+In the components we can also navigate programmatically by injecting the router and current route into the component and using the routers navigate method and the current route anywhere we need it and even pull params off it as we will learn.
+
+```ts
+import { Router, ActivatedRoute } from '@angular/router';
+
+// ...
+constructor(private serversService: ServersService, private router: Router, private route: ActivatedRoute) { }
+
+// ...
+
+onReload() {
+  this.router.navigate(['servers'], {relativeTo: this.route})
+}
+```
+
+We can pull off information from the params as we need using a snapshot.
+
+```ts
+ngOnInit() {
+    this.user = {
+      id: this.route.snapshot.params['id'],
+      name: this.route.snapshot.params['name']
+    }
+
+    this.route.params.subscribe((params: Params) => {
+      this.user.id = params.id;
+      this.user.name = params.name;
+    })
+  }
+```
+
+We can add more complex routing with making a link push a new path to our URL, however the content wouldn't be updated as we would want just using the snapshot, because the component doesn't re render.
+
+We can use the route.params observable and subscribe to changes to our url params and update our components properties live.
+
+If we know our component will be rerendered every time it is visited we can use the snapshot otherwise we will need to use the params observable.
+
+```html
+<p>User ID is {{ user.id }}</p>
+<p>User name is {{ user.name }}</p>
+<hr>
+<a [routerLink]="['/users', 10, 'Anna']">Load Anna 10</a>
+```
